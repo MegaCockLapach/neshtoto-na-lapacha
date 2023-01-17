@@ -1,0 +1,165 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Data.SqlClient;
+
+namespace ZadanieZaBabichki
+{
+    class MnMieZabavno
+    {
+        string connection = "Server= ;database=Teams;integrated security=true;";
+        private int id;
+
+        public int Id
+        {
+            get { return id; }
+            set { id = value; }
+        }
+        private string name;
+
+        public string Name
+        {
+            get { return name; }
+            set { name = value; }
+        }
+        private int playersCount;
+
+        public int PlayersCount
+        {
+            get { return playersCount; }
+            set { playersCount = value; }
+        }
+        private int trophies;
+
+        public int Trophies
+        {
+            get { return trophies; }
+            set { trophies = value; }
+        }
+        private string stadium;
+
+        public string Stadium
+        {
+            get { return stadium; }
+            set { stadium = value; }
+        }
+        private string championship;
+
+        public string Championship
+        {
+            get { return championship; }
+            set { championship = value; }
+        }
+        public MnMieZabavno(int id, string name,int playersCount,int trophies, string stadium,string championship)
+        {
+            Id = id;
+            Name = name;
+            PlayersCount = playersCount;
+            Trophies = trophies;
+            Stadium = stadium;
+            Championship = championship;
+        }
+        public MnMieZabavno()
+        {
+            id = 0;
+            name = null;
+            playersCount = 0;
+            trophies = 0;
+            stadium = null;
+            championship = null;
+        }
+        public void Add(MnMieZabavno teamName)
+        {
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+            using (con)
+            {
+                SqlCommand cmd = new SqlCommand("Insert into Team values(@id, @name, @playersCount, @trophies, @stadium, @championship)",con); //SqlCommand cmd = new SqlCommand("SET INSERT_IDENTITY Team ON Insert into Team values(@id, @name, @playersCount, @trophies, @stadium, @championship) SET INSERT_IDENTITY Team OFF",con);
+                cmd.Parameters.AddWithValue("@id",id);
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@playersCount", playersCount);
+                cmd.Parameters.AddWithValue("@trophies", trophies);
+                cmd.Parameters.AddWithValue("@stadium", stadium);
+                cmd.Parameters.AddWithValue("@championship", championship);
+                cmd.ExecuteNonQuery();
+            }
+            con.Close();
+        }
+        public void Update(int id, string name, int playersCount, int trophies, string stadium, string championship)
+        {
+            MnMieZabavno team = new MnMieZabavno();
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+            using(con)
+            {
+                SqlCommand cmd = new SqlCommand("Update Team set id=@id, name=@name, playersCount=@playersCount, trophies=@trophies, stadium=@stadium, championship=@championship;", con);
+                cmd.Parameters.AddWithValue("@id", id);
+                cmd.Parameters.AddWithValue("@name", name);
+                cmd.Parameters.AddWithValue("@playersCount", playersCount);
+                cmd.Parameters.AddWithValue("@trophies", trophies);
+                cmd.Parameters.AddWithValue("@stadium", stadium);
+                cmd.Parameters.AddWithValue("@championship", championship);
+                team.Add(team);
+                cmd.ExecuteNonQuery();
+            }
+            con.Close();
+        }
+        public void Delete(int id)
+        {
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+            using (con)
+            {
+                SqlCommand cmd = new SqlCommand("Delete from Team where id=@id;", con);
+                cmd.Parameters.AddWithValue("@id", id);
+            }
+            con.Close();
+        }
+        public void GetTeamsWithMoreThan25ppl()
+        {
+            MnMieZabavno team = new MnMieZabavno();
+            List<MnMieZabavno> teams = new List<MnMieZabavno>();
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+            using(con)
+            {
+                SqlCommand cmd = new SqlCommand("Select*from Team where playersCount>2@customPlayersCount;", con); //SqlCommand cmd = new SqlCommand("Select*from Team where trophies>@customTrophies;", con); cmd.Parameters.AddWithValue("@customPlayersCount",25);
+                SqlDataReader rdr = cmd.ExecuteReader();
+                using(rdr)
+                {
+                    team.Id = rdr.GetInt32(0);
+                    team.name = rdr.GetString(1);
+                    team.playersCount = rdr.GetInt32(2);
+                    team.trophies = rdr.GetInt32(3);
+                    team.stadium = rdr.GetString(4);
+                    team.championship = rdr.GetString(5);
+                }
+            }
+            con.Close();
+        }
+        public void GetTeamsWithMoreThan2Trophies()
+        {
+            MnMieZabavno team = new MnMieZabavno();
+            List<MnMieZabavno> teams = new List<MnMieZabavno>();
+            SqlConnection con = new SqlConnection(connection);
+            con.Open();
+            using (con)
+            {
+                SqlCommand cmd = new SqlCommand("Select*from Team where trophies>2;", con); //SqlCommand cmd = new SqlCommand("Select*from Team where trophies>@customTrophies;", con); cmd.Parameters.AddWithValue("@customTrophies",2);
+                SqlDataReader rdr = cmd.ExecuteReader();
+                using (rdr)
+                {
+                    team.Id = rdr.GetInt32(0);
+                    team.name = rdr.GetString(1);
+                    team.playersCount = rdr.GetInt32(2);
+                    team.trophies = rdr.GetInt32(3);
+                    team.stadium = rdr.GetString(4);
+                    team.championship = rdr.GetString(5);
+                }
+            }
+            con.Close();
+        }
+    }
+}
